@@ -15,10 +15,12 @@
     </select>
     <input name="cells" type="range" min="5" step="5" max="100" value="50"/>
     <output name="cellsoutput" for="cells">50</output>
+    <button name="usecam">Webcam</button>
   </form>
-  <canvas id="face" width="500" height="500">
+  <canvas id="face" width="1200" height="600">
     You need a browser that supports canvas.
   </canvas>
+  <video></video>
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script src="js/inyourface.js"></script>
   <script src="js/facejam.js"></script>

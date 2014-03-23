@@ -1,6 +1,14 @@
 (function() {
+  navigator.getUserMedia = (
+    navigator.getUserMedia || 
+      navigator.webkitGetUserMedia || 
+      navigator.mozGetUserMedia || 
+      navigator.msGetUserMedia);
+
+  var video = document.getElementsByTagName('video')[0];
   var shapeSelect = document.querySelectorAll('select[name="shape"]')[0];
   var cellInput = document.querySelectorAll('input[name="cells"]')[0];
+  var camButton = document.querySelectorAll('button[name="usecam"]')[0];
   var canvas = document.getElementsByTagName("canvas")[0];
   var ctx = canvas.getContext('2d');
   var img = new Image();
@@ -10,6 +18,12 @@
   var getShape = function() {
     return shapeSelect.options[shapeSelect.selectedIndex].value;
   };
+
+  camButton.addEventListener('click', function(event) {
+    event.preventDefault();
+    facePoints = {};
+    cam();
+  });
 
   var redraw = function(event) {
     if(!width || !height) {
@@ -27,6 +41,7 @@
   cellInput.onchange = redraw;
 
   img.onload = function() {
+    facePoints = {};
     aspectRatio = img.width / img.height;
     width = canvas.width = canvas.height * aspectRatio;
     height = canvas.height;
@@ -85,6 +100,47 @@
     };
     reader.readAsDataURL(file);
     return false;
+  };
+
+  var cam = function() {
+    var camStream = null;
+    
+    navigator.getUserMedia({ video: true, audio: false }, function(stream) {
+      var url = window.URL || window.webkitURL;
+      video.src = url ? url.createObjectURL(stream) : stream;
+      video.play();
+      camStream = stream;
+    }, function(err) {
+      console.log('error with stream!', err);
+    });
+
+    video.addEventListener('canplay', function(event) {
+      height = canvas.height;
+      //width = canvas.width;
+      //if (video.videoWidth > 0) height = video.videoHeight / (video.videoWidth / width);
+      aspectRatio = video.videoWidth / video.videoHeight;
+      width = canvas.width = canvas.height * aspectRatio;
+    });
+
+    var snap = false;
+
+    video.addEventListener('play', function() {
+      // Every 33 milliseconds copy the video image to the canvas
+      var vInterval = setInterval(function() {
+        if (video.paused || video.ended) return;
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(video, 0, 0, width, height);
+      }, 33);
+      
+      setTimeout(function() {
+        clearInterval(vInterval);
+        video.pause();
+        camStream.stop();
+        redraw();
+        canvas.style.display = 'none';
+      }, 5000);
+      
+    }, false);
   };
 
 })();

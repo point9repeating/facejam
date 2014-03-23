@@ -5,6 +5,10 @@ body {
     background-color:#000;
 }
 
+video {
+    display:none;
+}
+
 svg,
 canvas {
     margin: 0 auto;
