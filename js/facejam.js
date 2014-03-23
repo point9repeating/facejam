@@ -116,29 +116,30 @@
 
     video.addEventListener('canplay', function(event) {
       height = canvas.height;
-      //width = canvas.width;
-      //if (video.videoWidth > 0) height = video.videoHeight / (video.videoWidth / width);
       aspectRatio = video.videoWidth / video.videoHeight;
       width = canvas.width = canvas.height * aspectRatio;
     });
 
-    var snap = false;
-
     video.addEventListener('play', function() {
-      // Every 33 milliseconds copy the video image to the canvas
-      var vInterval = setInterval(function() {
+      var animate = function() {
         if (video.paused || video.ended) return;
         ctx.fillRect(0, 0, width, height);
         ctx.drawImage(video, 0, 0, width, height);
-      }, 33);
-      
+        canvas.style.display = 'none';
+        facePoints = {};
+        redraw();
+        requestAnimationFrame(animate);
+      }
+
+      requestAnimationFrame(animate);
+        
       setTimeout(function() {
-        clearInterval(vInterval);
         video.pause();
         camStream.stop();
+        facePoints = {};
         redraw();
         canvas.style.display = 'none';
-      }, 5000);
+      }, 10000);
       
     }, false);
   };
