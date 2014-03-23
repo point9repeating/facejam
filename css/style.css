@@ -1,0 +1,14 @@
+body{
+    width:100%;
+}
+
+svg,
+canvas {
+    margin: 0 auto;
+    display:block;
+    border: solid 5px blue;
+}
+
+canvas.hover {
+    border-color:green;
+}
