@@ -7,6 +7,14 @@
 </head>
 
 <body>
+  <form oninput="cellsoutput.value = cells.value">
+    <select name="shape">
+      <option value="rect">Rectangle</option>
+      <option value="circle">Circle</option>
+    </select>
+    <input name="cells" type="range" min="5" step="5" max="100" value="50"/>
+    <output name="cellsoutput" for="cells">50</output>
+  </form>
   <canvas id="face" width="500" height="500"></canvas>
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script src="js/inyourface.js"></script>
