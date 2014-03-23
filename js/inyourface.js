@@ -4,13 +4,15 @@ var inYourFace = function(data, width, height, shape) {
   var cellWidth = width / Math.sqrt(data.length);
   var cellHeight = height / Math.sqrt(data.length);
 
+  d3.select("body").select("svg").remove();
+  
   var svg = d3.select("body").
     append("svg").
     attr("width", width).
     attr("height", height).
     append("g");
 
-  svg.selectAll(shape).
+  var shapes = svg.selectAll(shape).
     data(data).
     enter().append(shape).
     attr('width', cellWidth).
@@ -20,7 +22,13 @@ var inYourFace = function(data, width, height, shape) {
     attr('r', Math.max(cellWidth, cellHeight) / 2).
     attr('cx', function(d, i) { return d.x * cellWidth + cellWidth / 2; }).
     attr('cy', function(d, i) { return d.y * cellHeight + cellHeight / 2; }).
-    attr('fill', function(d) { return 'rgb(' + d.r + ',' +  d.g + ',' + d.b + ')'; });
+    attr('fill', function(d) { return 'rgb(' + d.rgb.join(',') + ')'; });
+
+  if(shape === 'ellipse') {
+    shapes.
+      attr('rx', cellWidth / 2).
+      attr('ry', cellHeight / 2);
+  }
 };
 
 window.inYourFace = inYourFace;

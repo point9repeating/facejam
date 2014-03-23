@@ -4,55 +4,74 @@
   var canvas = document.getElementsByTagName("canvas")[0];
   var ctx = canvas.getContext('2d');
   var img = new Image();
+  var width, height, aspectRatio;
+  var facePoints = {};
+
+  var getShape = function() {
+    return shapeSelect.options[shapeSelect.selectedIndex].value;
+  };
+
+  var redraw = function(event) {
+    if(!width || !height) {
+      return;
+    }
+    var shape = getShape();
+    var cellCount = parseInt(cellInput.value);
+    if(!facePoints[cellCount]) {
+      facePoints[cellCount] = getFacePoints(cellCount);
+    }
+    inYourFace(facePoints[cellCount], width, height, getShape());
+  };
+
+  shapeSelect.onchange = redraw;
+  cellInput.onchange = redraw;
 
   img.onload = function() {
-    var N = parseInt(cellInput.value);
-    var shape = shapeSelect.options[shapeSelect.selectedIndex].value;
-    var aspectRatio = img.width / img.height;
-    var width = canvas.width = canvas.height * aspectRatio;
-    var height = canvas.height;
+    aspectRatio = img.width / img.height;
+    width = canvas.width = canvas.height * aspectRatio;
+    height = canvas.height;
+    ctx.drawImage(img, 0, 0, width, height);
+    redraw();
+    canvas.style.display = 'none';
+  };
+
+  var getFacePoints = function(N) {
     var patchWidth = width / N;
     var patchHeight = height / N;
-    var facePoints = [];
-
-    ctx.drawImage(img, 0, 0, width, height);
+    var points = [];
 
     for(var x=0; x < N; x++) {
       for(var y=0; y < N; y++) {
-	var patch = ctx.getImageData(
-	  x * patchWidth,
-	  y * patchHeight,
-	  patchWidth,
-	  patchHeight
-	  )
-	var count = 0;
-	var length = patch.data.length;
-	var rgb = {
-	  r: 0,
-	  g: 0,
-	  b: 0
-	};
+        var patch = ctx.getImageData(
+          x * patchWidth,
+          y * patchHeight,
+          patchWidth,
+          patchHeight
+        );
+        var count = 0;
+        var length = patch.data.length;
+        var rgb = [0, 0, 0];
+        var i = -4;
 
-	var i = -4;
-	while ( (i+=4) < length) {
-	  count++;
-	  rgb.r += patch.data[i];
-	  rgb.g += patch.data[i+1];
-	  rgb.b += patch.data[i+2];
-	}
+        while ( (i+=4) < length) {
+          count++;
+          rgb[0] += patch.data[i];
+          rgb[1] += patch.data[i+1];
+          rgb[2] += patch.data[i+2];
+        }
 
-	rgb.r = ~~(rgb.r / count);
-	rgb.g = ~~(rgb.g / count);
-	rgb.b = ~~(rgb.b / count);
-	rgb.x = x;
-	rgb.y = y;
+        rgb[0] = ~~(rgb[0] / count);
+        rgb[1] = ~~(rgb[1] / count);
+        rgb[2] = ~~(rgb[2] / count);
 
-	facePoints.push(rgb);
+        points.push({
+          x: x,
+          y: y,
+          rgb: rgb
+        });
       }
     }
-
-    inYourFace(facePoints, width, height, shape);
-    canvas.style.display = 'none';
+    return points;
   };
 
   canvas.ondragover = function () { this.className = 'hover'; return false; };
