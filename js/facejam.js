@@ -7,9 +7,11 @@
 
   var video = document.getElementsByTagName('video')[0];
   var shapeSelect = document.querySelectorAll('select[name="shape"]')[0];
+  var cellOutput = document.querySelectorAll('output[name="cellsoutput"]')[0];
   var cellInput = document.querySelectorAll('input[name="cells"]')[0];
   var camButton = document.querySelectorAll('button[name="usecam"]')[0];
-  var canvas = document.getElementsByTagName("canvas")[0];
+  //var canvas = document.getElementsByTagName("canvas")[0];
+  var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
   var img = new Image();
   var width, height, aspectRatio;
@@ -31,10 +33,14 @@
     }
     var shape = getShape();
     var cellCount = parseInt(cellInput.value);
+    var t = (new Date).getTime();
     if(!facePoints[cellCount]) {
       facePoints[cellCount] = getFacePoints(cellCount);
+      console.log("getfacepoints", (new Date).getTime() - t);
     }
-    inYourFace(facePoints[cellCount], width, height, getShape());
+    t = (new Date).getTime();
+    inYourFace(facePoints[cellCount], window.innerHeight*aspectRatio, window.innerHeight, getShape());
+    console.log("inyourface", (new Date).getTime() - t);
   };
 
   shapeSelect.onchange = redraw;
@@ -43,18 +49,23 @@
   img.onload = function() {
     facePoints = {};
     aspectRatio = img.width / img.height;
+    var cellCount = parseInt(cellInput.value);
     width = canvas.width = canvas.height * aspectRatio;
     height = canvas.height;
+    //width = canvas.width = cellCount;
+    //height = canvas.height = cellCount;
     ctx.drawImage(img, 0, 0, width, height);
     redraw();
     canvas.style.display = 'none';
   };
 
   var getFacePoints = function(N) {
-    var patchWidth = width / N;
-    var patchHeight = height / N;
+    N = Math.pow(2, N);
+    
+    var patchWidth = canvas.width / N;
+    var patchHeight = canvas.height / N;
     var points = [];
-
+    
     for(var x=0; x < N; x++) {
       for(var y=0; y < N; y++) {
         var patch = ctx.getImageData(
@@ -67,7 +78,7 @@
         var length = patch.data.length;
         var rgb = [0, 0, 0];
         var i = -4;
-
+        
         while ( (i+=4) < length) {
           count++;
           rgb[0] += patch.data[i];
@@ -89,9 +100,11 @@
     return points;
   };
 
-  canvas.ondragover = function () { this.className = 'hover'; return false; };
-  canvas.ondragend = function () { this.className = ''; return false; };
-  canvas.ondrop = function (e) {
+  var body = document.getElementsByTagName("body")[0];
+
+  body.ondragover = function () { return false; };
+  body.ondragend = function () { return false; };
+  body.ondrop = function (e) {
     e.preventDefault();
     var file = e.dataTransfer.files[0],
     reader = new FileReader();
@@ -115,9 +128,9 @@
     });
 
     video.addEventListener('canplay', function(event) {
-      height = canvas.height;
       aspectRatio = video.videoWidth / video.videoHeight;
-      width = canvas.width = canvas.height * aspectRatio;
+      canvas.width = width = video.videoWidth / 4;
+      canvas.height = height = video.videoHeight / 4;
     });
 
     video.addEventListener('play', function() {
@@ -132,14 +145,14 @@
       }
 
       requestAnimationFrame(animate);
-        
-      setTimeout(function() {
-        video.pause();
-        camStream.stop();
-        facePoints = {};
-        redraw();
-        canvas.style.display = 'none';
-      }, 10000);
+
+      document.addEventListener("keydown", function(event) {
+        if(event.keyCode === 32) {
+          event.preventDefault();
+          video.pause();
+          camStream.stop();
+        }
+      });
       
     }, false);
   };

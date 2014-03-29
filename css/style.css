@@ -1,5 +1,10 @@
+html {
+    height:100%;
+}
+
 body {
     width:100%;
+    height:100%;
     margin:0;
     padding:0;
     background-color:#000;
@@ -9,18 +14,13 @@ video {
     display:none;
 }
 
-svg,
-canvas {
+svg {
     margin: 0 auto;
     display:block;
 }
 
-canvas {
-    border: solid 5px blue;
-}
-
-canvas.hover {
-    border-color:green;
+form {
+    position:fixed;
 }
 
 output {
