@@ -14,9 +14,13 @@ video {
     display:none;
 }
 
-svg {
+svg.face {
     margin: 0 auto;
     display:block;
+}
+
+svg.colors {
+    float:left;
 }
 
 form {

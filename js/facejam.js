@@ -5,17 +5,31 @@
       navigator.mozGetUserMedia || 
       navigator.msGetUserMedia);
 
+  window.AudioContext = (
+    window.AudioContext ||
+      window.webkitAudioContext
+  );
+
+  var audioContext = new AudioContext();
+  var analyser = audioContext.createAnalyser();
+
+  window.analyser = analyser;
+
   var video = document.getElementsByTagName('video')[0];
+  var audio = document.getElementsByTagName('audio')[0];
   var shapeSelect = document.querySelectorAll('select[name="shape"]')[0];
   var cellOutput = document.querySelectorAll('output[name="cellsoutput"]')[0];
   var cellInput = document.querySelectorAll('input[name="cells"]')[0];
   var camButton = document.querySelectorAll('button[name="usecam"]')[0];
-  //var canvas = document.getElementsByTagName("canvas")[0];
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
   var img = new Image();
   var width, height, aspectRatio;
   var facePoints = {};
+  var audioPlaying = false;
+  var source = audioContext.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioContext.destination);
 
   var getShape = function() {
     return shapeSelect.options[shapeSelect.selectedIndex].value;
@@ -36,11 +50,20 @@
     var t = (new Date).getTime();
     if(!facePoints[cellCount]) {
       facePoints[cellCount] = getFacePoints(cellCount);
-      console.log("getfacepoints", (new Date).getTime() - t);
+      //console.log("getfacepoints", (new Date).getTime() - t);
     }
     t = (new Date).getTime();
-    inYourFace(facePoints[cellCount], window.innerHeight*aspectRatio, window.innerHeight, getShape());
-    console.log("inyourface", (new Date).getTime() - t);
+    var data = facePoints[cellCount];
+    var freqData;
+
+    if(audioPlaying) {
+      analyser.fftSize = Math.min(2 * data.length, 2048);
+      var freqData = new Float32Array(analyser.frequencyBinCount);
+      var freqData = new Uint8Array(analyser.frequencyBinCount)
+      analyser.getByteFrequencyData(freqData);
+    }
+    colorbar(data, freqData, window.innerHeight);
+    inYourFace(data, freqData, window.innerHeight*aspectRatio, window.innerHeight, getShape());
   };
 
   shapeSelect.onchange = redraw;
@@ -90,13 +113,23 @@
         rgb[1] = ~~(rgb[1] / count);
         rgb[2] = ~~(rgb[2] / count);
 
+        rgb = 'rgb(' + rgb.join(',') + ')';
+
         points.push({
           x: x,
           y: y,
-          rgb: rgb
+          rgb: rgb,
+          hsl: d3.hsl(rgb)
         });
       }
     }
+
+    points.sort(function(a, b) {
+      return a.hsl.l < b.hsl.l ? 1 : -1;
+      //return a.hsl.l > b.hsl.l ? 1 : -1;
+      //return a.hsl.h > b.hsl.h ? 1 : -1;
+    });
+
     return points;
   };
 
@@ -109,7 +142,10 @@
     var file = e.dataTransfer.files[0],
     reader = new FileReader();
     reader.onload = function (event) {
-      img.src = event.target.result;
+      //img.src = event.target.result;
+      audio.src = event.target.result;
+      audio.play();
+      audioPlaying = true;
     };
     reader.readAsDataURL(file);
     return false;
@@ -121,7 +157,10 @@
     navigator.getUserMedia({ video: true, audio: false }, function(stream) {
       var url = window.URL || window.webkitURL;
       video.src = url ? url.createObjectURL(stream) : stream;
+      //video.muted = true;
       video.play();
+      //audio.play();
+
       camStream = stream;
     }, function(err) {
       console.log('error with stream!', err);
@@ -150,6 +189,7 @@
         if(event.keyCode === 32) {
           event.preventDefault();
           video.pause();
+          audio.pause();
           camStream.stop();
         }
       });
