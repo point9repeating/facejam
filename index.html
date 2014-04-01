@@ -13,6 +13,22 @@
       <option value="rect">Rectangle</option>
       <option value="circle">Circle</option>
     </select>
+    <label for="colorsort-l">
+      <input id="colorsort-l" name="colorsort" type="radio" value="l" checked />
+      Lightness
+    </label>
+    <label for="colorsort-h">
+      <input id="colorsort-h" name="colorsort" type="radio" value="h" />
+      Hue
+    </label>
+    <label for="colorsort-s">
+      <input id="colorsort-s" name="colorsort" type="radio" value="s" />
+      Saturation
+    </label>
+    <label for="reverse-sort">
+      <input id="reverse-sort" name="reverse-sort" type="checkbox" />
+      Reverse color sort
+    </label>
     <input name="cells" type="range" min="0" step="1" max="7" value="5"/>
     <output name="cellsoutput" for="cells">32</output>
     <button name="usecam">Webcam</button>

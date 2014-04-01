@@ -27,6 +27,7 @@ form {
     position:fixed;
 }
 
-output {
+output,
+label {
     color:#fff;
 }

@@ -4,17 +4,17 @@ var currentShape;
 
 var colorbar = function(data, freqData, height) {
   var svg = d3.select('svg.colors');
-  var width = 100;
+  var width = 255;
 
   var width = function(i) {
     if(!freqData || !i) {
-      return 100;
+      return 255;
     }
-    return freqData[i] * 100 / 255;
+    return freqData[i];
   };
 
   if(svg.empty()) {
-    d3.select('body').
+    svg = d3.select('body').
       append('svg').
       attr('class', 'colors');
   }
