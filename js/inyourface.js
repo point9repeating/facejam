@@ -54,13 +54,15 @@ var inYourFace = function(data, freqData, width, height, shape) {
     if(!freqData) {
       return cw; 
     }
-    return 2 * freqData[i] * cw / 255;
+    return 2*freqData[i] * cw / 255 + cw / 2;// + 0.1 *cw;
+    return 2 * freqData[i] * cw / 255 + 0.1 *cw;
   };
   var cellHeight = function(i) {
     if(!freqData) {
       return ch; 
     }
-    return 2* freqData[i] * ch / 255;
+    return 2*freqData[i] * ch / 255 + cw / 2;// + 0.1*ch;
+    return 2* freqData[i] * ch / 255 + 0.1*ch;
   };
 
   if(shape !== currentShape) {

@@ -12,9 +12,6 @@
 
   var audioContext = new AudioContext();
   var analyser = audioContext.createAnalyser();
-
-  window.analyser = analyser;
-
   var video = document.getElementsByTagName('video')[0];
   var audio = document.getElementsByTagName('audio')[0];
   var shapeSelect = document.querySelectorAll('select[name="shape"]')[0];
@@ -23,17 +20,20 @@
   var colorSorts = document.getElementsByName('colorsort');
   var reverseSort = document.getElementById('reverse-sort');
   var camButton = document.querySelectorAll('button[name="usecam"]')[0];
+  var micButton = document.querySelectorAll('button[name="usemic"]')[0];
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
   var img = new Image();
   var width, height, aspectRatio;
   var facePoints = {};
   var audioPlaying = false;
-  var source = audioContext.createMediaElementSource(audio);
-  source.connect(analyser);
-  analyser.connect(audioContext.destination);
-  //analyser.maxDecibels = -10;
-  //analyser.smoothingTimeConstant = 0;
+  //for audio element (droppin' trax)
+  //var source = audioContext.createMediaElementSource(audio);
+  //source.connect(analyser);
+  //analyser.connect(audioContext.destination);
+  analyser.minDecibels = -65;
+  analyser.maxDecibels = -5;
+  analyser.smoothingTimeConstant = 0;
 
   var getShape = function() {
     return shapeSelect.options[shapeSelect.selectedIndex].value;
@@ -54,6 +54,17 @@
     event.preventDefault();
     facePoints = {};
     cam();
+  });
+
+  micButton.addEventListener('click', function(event) {
+    event.preventDefault();
+    navigator.getUserMedia({ video: false, audio: true }, function(stream) {
+      source = audioContext.createMediaStreamSource(stream);
+      source.connect(analyser);
+      audioPlaying = true;
+    }, function(err) {
+      console.log('error with stream!', err);
+    });
   });
 
   var t = 0;
