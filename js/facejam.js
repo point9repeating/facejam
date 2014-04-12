@@ -21,6 +21,9 @@
   var reverseSort = document.getElementById('reverse-sort');
   var camButton = document.querySelectorAll('button[name="usecam"]')[0];
   var micButton = document.querySelectorAll('button[name="usemic"]')[0];
+  var pixelPerf = document.getElementById('pixelmath-perf');
+  var renderPerf = document.getElementById('render-perf');
+  var fps = document.getElementById('fps');
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
   var img = new Image();
@@ -67,19 +70,17 @@
     });
   });
 
-  var t = 0;
-
   var redraw = function(event) {
     if(!width || !height) {
       return;
     }
-    t++;
     var shape = getShape();
     var cellCount = parseInt(cellInput.value);
     var t = (new Date).getTime();
     if(!facePoints[cellCount]) {
       facePoints[cellCount] = getFacePoints(cellCount);
     }
+    pixelPerf.innerHTML = (new Date).getTime() - t;
     t = (new Date).getTime();
     var data = facePoints[cellCount];
     var freqData, freqByteData;
@@ -91,9 +92,11 @@
       analyser.getByteFrequencyData(freqByteData);
       //analyser.getFloatFrequencyData(freqData);
     }
-
+    
+    t = (new Date).getTime();
     colorbar(data, freqByteData, window.innerHeight);
     inYourFace(data, freqByteData, window.innerHeight*aspectRatio, window.innerHeight, getShape());
+    renderPerf.innerHTML = (new Date).getTime() - t;
   };
 
   shapeSelect.onchange = function() {
@@ -113,11 +116,8 @@
     var cellCount = parseInt(cellInput.value);
     width = canvas.width = canvas.height * aspectRatio;
     height = canvas.height;
-    //width = canvas.width = cellCount;
-    //height = canvas.height = cellCount;
     ctx.drawImage(img, 0, 0, width, height);
     redraw();
-    canvas.style.display = 'none';
   };
 
   var getFacePoints = function(N) {
@@ -201,10 +201,7 @@
     navigator.getUserMedia({ video: true, audio: false }, function(stream) {
       var url = window.URL || window.webkitURL;
       video.src = url ? url.createObjectURL(stream) : stream;
-      //video.muted = true;
       video.play();
-      //audio.play();
-
       camStream = stream;
     }, function(err) {
       console.log('error with stream!', err);
@@ -221,12 +218,13 @@
         if (video.paused || video.ended) return;
         ctx.fillRect(0, 0, width, height);
         ctx.drawImage(video, 0, 0, width, height);
-        canvas.style.display = 'none';
         facePoints = {};
         redraw();
+        fps.innerHTML = Math.round(1000 / ((new Date).getTime() - lastFrameTime));
+        lastFrameTime = (new Date).getTime();
         requestAnimationFrame(animate);
       }
-
+      var lastFrameTime = (new Date).getTime();
       requestAnimationFrame(animate);
 
       document.addEventListener("keydown", function(event) {

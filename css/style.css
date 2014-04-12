@@ -8,6 +8,7 @@ body {
     margin:0;
     padding:0;
     background-color:#000;
+    color:#fff;
 }
 
 video {
@@ -27,7 +28,8 @@ form {
     position:fixed;
 }
 
-output,
-label {
-    color:#fff;
+#performance {
+    position:fixed;
+    bottom:0;
+    left:0;
 }
