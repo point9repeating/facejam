@@ -17,6 +17,7 @@
   var shapeSelect = document.querySelectorAll('select[name="shape"]')[0];
   var cellOutput = document.querySelectorAll('output[name="cellsoutput"]')[0];
   var cellInput = document.querySelectorAll('input[name="cells"]')[0];
+  var minDecibelInput = document.getElementById('min-decibels');
   var colorSorts = document.getElementsByName('colorsort');
   var reverseSort = document.getElementById('reverse-sort');
   var camButton = document.querySelectorAll('button[name="usecam"]')[0];
@@ -34,8 +35,8 @@
   //var source = audioContext.createMediaElementSource(audio);
   //source.connect(analyser);
   //analyser.connect(audioContext.destination);
-  analyser.minDecibels = -65;
   analyser.maxDecibels = -5;
+  analyser.minDecibels = -70;
   analyser.smoothingTimeConstant = 0;
 
   var getShape = function() {
@@ -52,6 +53,10 @@
     }
     return sortBy;
   };
+
+  minDecibelInput.addEventListener('change', function(event) {
+    analyser.minDecibels = 0 - this.value;
+  });
 
   camButton.addEventListener('click', function(event) {
     event.preventDefault();
