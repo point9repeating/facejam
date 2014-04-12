@@ -211,6 +211,9 @@
       aspectRatio = video.videoWidth / video.videoHeight;
       canvas.width = width = video.videoWidth / 4;
       canvas.height = height = video.videoHeight / 4;
+      //mirror the video
+      ctx.translate(width, 0);
+      ctx.scale(-1, 1);
     });
 
     video.addEventListener('play', function() {
