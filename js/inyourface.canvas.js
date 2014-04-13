@@ -50,8 +50,28 @@ var shapes = {
     facejam.stroke();
     facejam.closePath();
   },
-  ellipse: function(color, x, y, width, height) {
-
+  triangle: function(color, x, y, cw, ch, width, height) {
+    facejam.fillStyle = color;
+    facejam.beginPath();
+    facejam.moveTo(x * width, y * height);
+    facejam.lineTo(x * width + cw, y * height);
+    facejam.lineTo(x * width + cw, y * height + ch);
+    facejam.lineTo(x * width, y * height);
+    facejam.fill();
+    facejam.stroke();
+    facejam.closePath();
+  },
+  parallelogram: function(color, x, y, cw, ch, width, height) {
+    facejam.fillStyle = color;
+    facejam.beginPath();
+    facejam.moveTo(x * width + cw / 2, y * height);
+    facejam.lineTo(x * width + cw, y * height);
+    facejam.lineTo(x * width + cw / 2, y * height + ch);
+    facejam.lineTo(x * width, y * height + ch);
+    facejam.lineTo(x * width + cw / 2, y * height);
+    facejam.fill();
+    facejam.stroke();
+    facejam.closePath();
   }
 };
 
