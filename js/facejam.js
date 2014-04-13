@@ -21,6 +21,7 @@
   var distortionInput = document.getElementById('distortion');
   var colorSorts = document.getElementsByName('colorsort');
   var reverseSort = document.getElementById('reverse-sort');
+  var stroke = document.getElementById('stroke');
   var camButton = document.querySelectorAll('button[name="usecam"]')[0];
   var micButton = document.querySelectorAll('button[name="usemic"]')[0];
   var pixelPerf = document.getElementById('pixelmath-perf');
@@ -102,7 +103,7 @@
     
     t = (new Date).getTime();
     colorbar(data, freqByteData, window.innerHeight);
-    inYourFace(data, freqByteData, window.innerHeight*aspectRatio, window.innerHeight, getShape(), distortionInput.value);
+    inYourFace(data, freqByteData, window.innerHeight*aspectRatio, window.innerHeight, getShape(), distortionInput.value, stroke.checked);
     renderPerf.innerHTML = (new Date).getTime() - t;
   };
 

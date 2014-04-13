@@ -31,12 +31,12 @@ var colorbar = function(data, freqData, height) {
 window.colorbar = colorbar;
 
 var shapes = {
-  rect: function(color, x, y, cw, ch, width, height) {
+  rect: function(color, stroke, x, y, cw, ch, width, height) {
     facejam.fillStyle = color;
     facejam.fillRect(x * width, y * height, cw, ch);
-    facejam.strokeRect(x * width, y* height, cw, ch);
+    (stroke && facejam.strokeRect(x * width, y* height, cw, ch));
   },
-  circle: function(color, x, y, cw, ch, width, height) {
+  circle: function(color, stroke, x, y, cw, ch, width, height) {
     facejam.fillStyle = color;
     facejam.beginPath();
     facejam.arc(
@@ -47,10 +47,10 @@ var shapes = {
       Math.PI*2,true
     );
     facejam.fill();
-    facejam.stroke();
+    (stroke && facejam.stroke());
     facejam.closePath();
   },
-  triangle: function(color, x, y, cw, ch, width, height) {
+  triangle: function(color, stroke, x, y, cw, ch, width, height) {
     facejam.fillStyle = color;
     facejam.beginPath();
     facejam.moveTo(x * width, y * height);
@@ -58,10 +58,10 @@ var shapes = {
     facejam.lineTo(x * width + cw, y * height + ch);
     facejam.lineTo(x * width, y * height);
     facejam.fill();
-    facejam.stroke();
+    (stroke && facejam.stroke());
     facejam.closePath();
   },
-  parallelogram: function(color, x, y, cw, ch, width, height) {
+  parallelogram: function(color, stroke, x, y, cw, ch, width, height) {
     facejam.fillStyle = color;
     facejam.beginPath();
     facejam.moveTo(x * width + cw / 2, y * height);
@@ -70,12 +70,12 @@ var shapes = {
     facejam.lineTo(x * width, y * height + ch);
     facejam.lineTo(x * width + cw / 2, y * height);
     facejam.fill();
-    facejam.stroke();
+    (stroke && facejam.stroke());
     facejam.closePath();
   }
 };
 
-var inYourFace = function(data, freqData, width, height, shape, distort) {
+var inYourFace = function(data, freqData, width, height, shape, distort, stroke) {
   var cellWidth = width / Math.sqrt(data.length);
   var cellHeight = height / Math.sqrt(data.length);
   var cw = width / Math.sqrt(data.length);
@@ -111,7 +111,7 @@ var inYourFace = function(data, freqData, width, height, shape, distort) {
   canvas.height = height;
 
   data.forEach(function(d, i) {
-    shapes[shape](d.rgb, d.x, d.y, cellWidth(i), cellHeight(i), cw, ch);
+    shapes[shape](d.rgb, stroke, d.x, d.y, cellWidth(i), cellHeight(i), cw, ch);
   });
 };
 
