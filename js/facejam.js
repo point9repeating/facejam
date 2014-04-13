@@ -39,6 +39,8 @@
   analyser.minDecibels = -70;
   analyser.smoothingTimeConstant = 0.3;
 
+  var fibonacci = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
+
   var getShape = function() {
     return shapeSelect.options[shapeSelect.selectedIndex].value;
   };
@@ -125,37 +127,42 @@
     redraw();
   };
 
+  var round = function(x) {
+    return ~~(x + 0.5);
+  };
+
   var getFacePoints = function(N) {
     N = Math.pow(2, N);
-    
+
+    var canWidth = canvas.width;
     var patchWidth = canvas.width / N;
     var patchHeight = canvas.height / N;
     var points = [];
+    var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     
-    for(var x=0; x < N; x++) {
-      for(var y=0; y < N; y++) {
-        var patch = ctx.getImageData(
-          x * patchWidth,
-          y * patchHeight,
-          patchWidth,
-          patchHeight
-        );
+    for(var y=0; y < N; y++) {
+      var y1 = round( y * patchHeight );
+      var y2 = round( ( y + 1 ) * patchHeight );
+      var h = y2 - y1;
+      for(var x=0; x < N; x++) {
+        var x1 = round( x * patchWidth );
+        var x2 = round( ( x + 1 ) * patchWidth );
         var count = 0;
-        var length = patch.data.length;
         var rgb = [0, 0, 0];
-        var i = -4;
-        
-        while ( (i+=4) < length) {
-          count++;
-          rgb[0] += patch.data[i];
-          rgb[1] += patch.data[i+1];
-          rgb[2] += patch.data[i+2];
-        }
 
+        for(var j=y1; j < y2; j++) {
+          for(var k=x1; k < x2; k++) {
+            count++;
+            var index = (j * canWidth + k) * 4
+            rgb[0] += imageData.data[index];
+            rgb[1] += imageData.data[index + 1];
+            rgb[2] += imageData.data[index + 2];
+          }
+        }
+        
         rgb[0] = ~~(rgb[0] / count);
         rgb[1] = ~~(rgb[1] / count);
         rgb[2] = ~~(rgb[2] / count);
-
         rgb = 'rgb(' + rgb.join(',') + ')';
 
         points.push({

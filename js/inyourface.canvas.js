@@ -7,15 +7,12 @@ var colorbarCtx = colorbarCan.getContext('2d');
 var facejam = canvas.getContext('2d');
 
 var colorbar = function(data, freqData, height) {
-  //var svg = d3.select('svg.colors');
-  var width = 255;
-
   var width = function(i) {
     if(!freqData || !i) {
       return 255;
     }
     if(data.length > freqData.length) {
-      i = Math.round( i / 4 );
+      i = Math.round( i / (data.length / freqData.length) );
     }
 
     return freqData[i];
@@ -67,13 +64,13 @@ var inYourFace = function(data, freqData, width, height, shape) {
       return cw; 
     }
     if (data.length > freqData.length) {
-      i = Math.round(i / 4);
+      i = Math.round(i / (data.length / freqData.length));
     }
-    if(!freqData[i]) {
+    if(freqData[i] === undefined) {
       return cw / 2;
     }
 
-    return 2*freqData[i] * cw / 255 + cw / 2;// + 0.1 *cw;
+    return 4*freqData[i] * cw / 255;// + cw / 2;// + 0.1 *cw;
     return 2 * freqData[i] * cw / 255 + 0.1 *cw;
   };
   var cellHeight = function(i) {
@@ -81,12 +78,12 @@ var inYourFace = function(data, freqData, width, height, shape) {
       return ch; 
     }
     if (data.length > freqData.length) {
-      i = Math.round(i / 4);
+      i = Math.round(i / (data.length / freqData.length));
     }
-    if(!freqData[i]) {
+    if(freqData[i] === undefined) {
       return cw / 2;
     }
-    return 2*freqData[i] * ch / 255 + cw / 2;// + 0.1*ch;
+    return 4*freqData[i] * ch / 255;// + cw / 2;// + 0.1*ch;
     return 2* freqData[i] * ch / 255 + 0.1*ch;
   };
 
