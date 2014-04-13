@@ -18,6 +18,7 @@
   var cellOutput = document.querySelectorAll('output[name="cellsoutput"]')[0];
   var cellInput = document.querySelectorAll('input[name="cells"]')[0];
   var minDecibelInput = document.getElementById('min-decibels');
+  var distortionInput = document.getElementById('distortion');
   var colorSorts = document.getElementsByName('colorsort');
   var reverseSort = document.getElementById('reverse-sort');
   var camButton = document.querySelectorAll('button[name="usecam"]')[0];
@@ -81,7 +82,6 @@
     if(!width || !height) {
       return;
     }
-    var shape = getShape();
     var cellCount = parseInt(cellInput.value);
     var t = (new Date).getTime();
     if(!facePoints[cellCount]) {
@@ -102,19 +102,8 @@
     
     t = (new Date).getTime();
     colorbar(data, freqByteData, window.innerHeight);
-    inYourFace(data, freqByteData, window.innerHeight*aspectRatio, window.innerHeight, getShape());
+    inYourFace(data, freqByteData, window.innerHeight*aspectRatio, window.innerHeight, getShape(), distortionInput.value);
     renderPerf.innerHTML = (new Date).getTime() - t;
-  };
-
-  shapeSelect.onchange = function() {
-    if(video.paused || video.ended) {
-      requestAnimationFrame(redraw);
-    }
-  };
-  cellInput.onchange = function() {
-    if(video.paused || video.ended) {
-      requestAnimationFrame(redraw);
-    }
   };
 
   img.onload = function() {

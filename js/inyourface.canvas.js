@@ -34,6 +34,7 @@ var shapes = {
   rect: function(color, x, y, cw, ch, width, height) {
     facejam.fillStyle = color;
     facejam.fillRect(x * width, y * height, cw, ch);
+    facejam.strokeRect(x * width, y* height, cw, ch);
   },
   circle: function(color, x, y, cw, ch, width, height) {
     facejam.fillStyle = color;
@@ -46,6 +47,7 @@ var shapes = {
       Math.PI*2,true
     );
     facejam.fill();
+    facejam.stroke();
     facejam.closePath();
   },
   ellipse: function(color, x, y, width, height) {
@@ -53,7 +55,7 @@ var shapes = {
   }
 };
 
-var inYourFace = function(data, freqData, width, height, shape) {
+var inYourFace = function(data, freqData, width, height, shape, distort) {
   var cellWidth = width / Math.sqrt(data.length);
   var cellHeight = height / Math.sqrt(data.length);
   var cw = width / Math.sqrt(data.length);
@@ -70,8 +72,7 @@ var inYourFace = function(data, freqData, width, height, shape) {
       return cw / 2;
     }
 
-    return 4*freqData[i] * cw / 255;// + cw / 2;// + 0.1 *cw;
-    return 2 * freqData[i] * cw / 255 + 0.1 *cw;
+    return distort*freqData[i] * cw / 255;
   };
   var cellHeight = function(i) {
     if(!freqData) {
@@ -83,8 +84,7 @@ var inYourFace = function(data, freqData, width, height, shape) {
     if(freqData[i] === undefined) {
       return cw / 2;
     }
-    return 4*freqData[i] * ch / 255;// + cw / 2;// + 0.1*ch;
-    return 2* freqData[i] * ch / 255 + 0.1*ch;
+    return distort*freqData[i] * ch / 255;
   };
 
   canvas.width = width;
