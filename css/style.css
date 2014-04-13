@@ -15,12 +15,13 @@ video {
     display:none;
 }
 
-svg.face {
-    margin: 0 auto;
-    display:block;
+#facejam {
+    position:fixed;
+    right:0;
+    z-index:-1;
 }
 
-svg.colors {
+.colors {
     float:left;
 }
 

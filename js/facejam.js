@@ -37,7 +37,7 @@
   //analyser.connect(audioContext.destination);
   analyser.maxDecibels = -5;
   analyser.minDecibels = -70;
-  analyser.smoothingTimeConstant = 0;
+  analyser.smoothingTimeConstant = 0.3;
 
   var getShape = function() {
     return shapeSelect.options[shapeSelect.selectedIndex].value;
