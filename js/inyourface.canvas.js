@@ -31,14 +31,12 @@ var colorbar = function(data, freqData, height) {
 window.colorbar = colorbar;
 
 var shapes = {
-  rect: function(color, stroke, x, y, cw, ch, width, height) {
-    facejam.fillStyle = color;
-    facejam.fillRect(x * width, y * height, cw, ch);
-    (stroke && facejam.strokeRect(x * width, y* height, cw, ch));
+
+  rect: function(x, y, cw, ch, width, height) {
+    facejam.rect(x * width, y * height, cw, ch);
   },
-  circle: function(color, stroke, x, y, cw, ch, width, height) {
-    facejam.fillStyle = color;
-    facejam.beginPath();
+
+  circle: function(x, y, cw, ch, width, height) {
     facejam.arc(
       x * width + width / 2, 
       y * height + height / 2,
@@ -46,36 +44,41 @@ var shapes = {
       0,
       Math.PI*2,true
     );
-    facejam.fill();
-    (stroke && facejam.stroke());
-    facejam.closePath();
   },
-  triangle: function(color, stroke, x, y, cw, ch, width, height) {
-    facejam.fillStyle = color;
-    facejam.beginPath();
+
+  triangle: function(x, y, cw, ch, width, height) {
     facejam.moveTo(x * width, y * height);
     facejam.lineTo(x * width + cw, y * height);
     facejam.lineTo(x * width + cw, y * height + ch);
     facejam.lineTo(x * width, y * height);
-    facejam.fill();
-    (stroke && facejam.stroke());
-    facejam.closePath();
   },
-  parallelogram: function(color, stroke, x, y, cw, ch, width, height) {
-    facejam.fillStyle = color;
-    facejam.beginPath();
+
+  parallelogram: function(x, y, cw, ch, width, height) {
     facejam.moveTo(x * width + cw / 2, y * height);
     facejam.lineTo(x * width + cw, y * height);
     facejam.lineTo(x * width + cw / 2, y * height + ch);
     facejam.lineTo(x * width, y * height + ch);
     facejam.lineTo(x * width + cw / 2, y * height);
-    facejam.fill();
-    (stroke && facejam.stroke());
-    facejam.closePath();
+  },
+  
+  pentagon: function(x, y, cw, ch, width, height) {
+    x = x * width;
+    y = y * height;
+    var delta = Math.tan(30 * Math.PI / 180) / 2;
+
+    facejam.moveTo(x + cw / 2, y);
+    facejam.lineTo(x + cw, y + ch * delta);
+    facejam.lineTo(x + cw - cw * delta, y + ch);
+    facejam.lineTo(x + cw * delta, y + ch);
+    facejam.lineTo(x, y + ch * delta);
+    facejam.lineTo(x + cw / 2, y);
   }
+
 };
 
-var inYourFace = function(data, freqData, width, height, shape, distort, stroke) {
+var shapeKeys = Object.keys(shapes);
+
+var inYourFace = function(data, freqData, width, height, shape, distort, stroke, fill) {
   var cellWidth = width / Math.sqrt(data.length);
   var cellHeight = height / Math.sqrt(data.length);
   var cw = width / Math.sqrt(data.length);
@@ -111,7 +114,18 @@ var inYourFace = function(data, freqData, width, height, shape, distort, stroke)
   canvas.height = height;
 
   data.forEach(function(d, i) {
-    shapes[shape](d.rgb, stroke, d.x, d.y, cellWidth(i), cellHeight(i), cw, ch);
+    var render = shapes[shape];
+    if(shape === 'random') {
+      render = shapes[shapeKeys[Math.round(Math.random() * (shapeKeys.length - 1))]];
+    }
+    facejam.fillStyle = d.rgb;
+    facejam.strokeStyle = d.rgb;
+    facejam.lineWidth = 1;
+    facejam.beginPath();
+    render(d.x, d.y, cellWidth(i), cellHeight(i), cw, ch);
+    (fill && facejam.fill());
+    (stroke && facejam.stroke());
+    facejam.closePath();
   });
 };
 

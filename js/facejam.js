@@ -22,6 +22,7 @@
   var colorSorts = document.getElementsByName('colorsort');
   var reverseSort = document.getElementById('reverse-sort');
   var stroke = document.getElementById('stroke');
+  var fill = document.getElementById('fill');
   var camButton = document.querySelectorAll('button[name="usecam"]')[0];
   var micButton = document.querySelectorAll('button[name="usemic"]')[0];
   var pixelPerf = document.getElementById('pixelmath-perf');
@@ -103,7 +104,7 @@
     
     t = (new Date).getTime();
     colorbar(data, freqByteData, window.innerHeight);
-    inYourFace(data, freqByteData, window.innerHeight*aspectRatio, window.innerHeight, getShape(), distortionInput.value, stroke.checked);
+    inYourFace(data, freqByteData, window.innerHeight*aspectRatio, window.innerHeight, getShape(), distortionInput.value, stroke.checked, fill.checked);
     renderPerf.innerHTML = (new Date).getTime() - t;
   };
 
@@ -129,7 +130,7 @@
     var patchHeight = canvas.height / N;
     var points = [];
     var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    
+
     for(var y=0; y < N; y++) {
       var y1 = round( y * patchHeight );
       var y2 = round( ( y + 1 ) * patchHeight );
@@ -149,17 +150,24 @@
             rgb[2] += imageData.data[index + 2];
           }
         }
-        
+
+        //negative
+        //rgb[0] = (255 - ~~(rgb[0] / count));
+        //rgb[1] = (255 - ~~(rgb[1] / count));
+        //rgb[2] = (255 - ~~(rgb[2] / count));
+
         rgb[0] = ~~(rgb[0] / count);
         rgb[1] = ~~(rgb[1] / count);
         rgb[2] = ~~(rgb[2] / count);
+
         rgb = 'rgb(' + rgb.join(',') + ')';
+        var hsl = d3.hsl(rgb);
 
         points.push({
           x: x,
           y: y,
           rgb: rgb,
-          hsl: d3.hsl(rgb)
+          hsl: hsl
         });
       }
     }
