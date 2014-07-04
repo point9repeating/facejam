@@ -28,6 +28,7 @@
   var pixelPerf = document.getElementById('pixelmath-perf');
   var renderPerf = document.getElementById('render-perf');
   var fps = document.getElementById('fps');
+  var sortPerf = document.getElementById('sort-perf');
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
   var img = new Image();
@@ -173,14 +174,32 @@
     }
     
     var sortBy = getSortBy();
+
     var sort = reverseSort.checked ? 
       function(a, b) {
-        return a.hsl[sortBy] < b.hsl[sortBy] ? -1 : 1;
+        return a.hsl < b.hsl ? -1 : 1;
       } : function(a, b) {
-        return a.hsl[sortBy] < b.hsl[sortBy] ? 1 : -1;
+        return a.hsl < b.hsl ? 1 : -1;
       };
 
-    return points.sort(sort);
+    var map = points.map(function(p, i) {
+      return {
+        hsl: p.hsl[sortBy],
+        i: i
+      };
+    });
+
+    var t = (new Date).getTime();
+
+    map.sort(sort);
+
+    var sorted = map.map(function(x) {
+      return points[x.i];
+    });
+
+    sortPerf.innerHTML = (new Date).getTime() - t;
+
+    return sorted;
   };
 
   var body = document.getElementsByTagName("body")[0];

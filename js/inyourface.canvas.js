@@ -119,7 +119,7 @@ var inYourFace = function(data, freqData, width, height, shape, distort, stroke,
       render = shapes[shapeKeys[Math.round(Math.random() * (shapeKeys.length - 1))]];
     }
     facejam.fillStyle = d.rgb;
-    facejam.strokeStyle = d.rgb;
+    facejam.strokeStyle = fill ? 'black' : d.rgb;
     facejam.lineWidth = 1;
     facejam.beginPath();
     render(d.x, d.y, cellWidth(i), cellHeight(i), cw, ch);
