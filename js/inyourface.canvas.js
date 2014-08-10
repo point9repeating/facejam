@@ -79,35 +79,20 @@ var shapes = {
 var shapeKeys = Object.keys(shapes);
 
 var inYourFace = function(data, freqData, width, height, shape, distort, stroke, fill) {
-  var cellWidth = width / Math.sqrt(data.length);
-  var cellHeight = height / Math.sqrt(data.length);
   var cw = width / Math.sqrt(data.length);
   var ch = height / Math.sqrt(data.length);
 
-  var cellWidth = function(i) {
+  var scale = function(i) {
     if(!freqData) {
-      return cw; 
+      return 1; 
     }
     if (data.length > freqData.length) {
       i = Math.round(i / (data.length / freqData.length));
     }
     if(freqData[i] === undefined) {
-      return cw / 2;
+      return 0.5;
     }
-
-    return distort*freqData[i] * cw / 255;
-  };
-  var cellHeight = function(i) {
-    if(!freqData) {
-      return ch; 
-    }
-    if (data.length > freqData.length) {
-      i = Math.round(i / (data.length / freqData.length));
-    }
-    if(freqData[i] === undefined) {
-      return cw / 2;
-    }
-    return distort*freqData[i] * ch / 255;
+    return distort*freqData[i] / 255;
   };
 
   canvas.width = width;
@@ -122,7 +107,8 @@ var inYourFace = function(data, freqData, width, height, shape, distort, stroke,
     facejam.strokeStyle = fill ? 'black' : d.rgb;
     facejam.lineWidth = 1;
     facejam.beginPath();
-    render(d.x, d.y, cellWidth(i), cellHeight(i), cw, ch);
+    var x = scale(i);
+    render(d.x, d.y, x*cw, x*ch, cw, ch);
     (fill && facejam.fill());
     (stroke && facejam.stroke());
     facejam.closePath();

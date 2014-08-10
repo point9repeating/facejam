@@ -29,7 +29,11 @@
   var renderPerf = document.getElementById('render-perf');
   var fps = document.getElementById('fps');
   var sortPerf = document.getElementById('sort-perf');
+  var hslPerf = document.getElementById('hsl-perf');
+  var imageDataPerf = document.getElementById('image-data-perf');
   var canvas = document.createElement('canvas');
+  var outCanvas = document.getElementById('facejam');
+  var timeline = document.getElementById('timeline');
   var ctx = canvas.getContext('2d');
   var img = new Image();
   var width, height, aspectRatio;
@@ -39,7 +43,7 @@
   //var source = audioContext.createMediaElementSource(audio);
   //source.connect(analyser);
   //analyser.connect(audioContext.destination);
-  analyser.maxDecibels = -5;
+  analyser.maxDecibels = -3;
   analyser.minDecibels = -70;
   analyser.smoothingTimeConstant = 0.3;
 
@@ -105,7 +109,9 @@
     
     t = (new Date).getTime();
     colorbar(data, freqByteData, window.innerHeight);
-    inYourFace(data, freqByteData, window.innerHeight*aspectRatio, window.innerHeight, getShape(), distortionInput.value, stroke.checked, fill.checked);
+    var outWidth = window.innerHeight*aspectRatio;
+    var outHeight = window.innerHeight;
+    inYourFace(data, freqByteData, outWidth, outHeight, getShape(), distortionInput.value, stroke.checked, fill.checked);
     renderPerf.innerHTML = (new Date).getTime() - t;
   };
 
@@ -125,12 +131,16 @@
 
   var getFacePoints = function(N) {
     N = Math.pow(2, N);
+    if(N === 128) N = 80;
 
     var canWidth = canvas.width;
     var patchWidth = canvas.width / N;
     var patchHeight = canvas.height / N;
     var points = [];
+    var tid = (new Date).getTime();
     var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    imageDataPerf.innerHTML = (new Date).getTime() - tid;
+    var hslTime = 0;
 
     for(var y=0; y < N; y++) {
       var y1 = round( y * patchHeight );
@@ -151,7 +161,6 @@
             rgb[2] += imageData.data[index + 2];
           }
         }
-
         //negative
         //rgb[0] = (255 - ~~(rgb[0] / count));
         //rgb[1] = (255 - ~~(rgb[1] / count));
@@ -162,8 +171,12 @@
         rgb[2] = ~~(rgb[2] / count);
 
         rgb = 'rgb(' + rgb.join(',') + ')';
+
+        var t = (new Date).getTime();
         var hsl = d3.hsl(rgb);
 
+        hslTime += (new Date).getTime() - t;
+        
         points.push({
           x: x,
           y: y,
@@ -198,6 +211,7 @@
     });
 
     sortPerf.innerHTML = (new Date).getTime() - t;
+    hslPerf.innerHTML = hslTime;
 
     return sorted;
   };
@@ -211,7 +225,6 @@
     var file = e.dataTransfer.files[0],
     reader = new FileReader();
     reader.onload = function (event) {
-      //img.src = event.target.result;
       audio.src = event.target.result;
       audio.play();
       audioPlaying = true;
@@ -255,21 +268,41 @@
         fps.innerHTML = Math.round(1000 / ((new Date).getTime() - lastFrameTime));
         lastFrameTime = (new Date).getTime();
         requestAnimationFrame(animate);
-      }
+      };
       var lastFrameTime = (new Date).getTime();
       requestAnimationFrame(animate);
 
       document.addEventListener("keydown", function(event) {
         if(event.keyCode === 32) {
           event.preventDefault();
-          video.pause();
-          audio.pause();
-          audioPlaying = false;
-          camStream.stop();
+          var url = outCanvas.toDataURL('image/png');
+          window.open(url);
         }
       });
       
+      var now = (new Date).getTime();
+      var takeSnapShot = function() {
+        if((new Date).getTime() - now > 5000) {
+          var img = new Image();
+          img.src = outCanvas.toDataURL('image/png');
+          //var link = document.createElement('a');
+          //a.appendChild(img);
+          
+          timeline.appendChild(img);
+
+          now = (new Date).getTime();
+        }
+        requestAnimationFrame(takeSnapShot);
+      };
+      //requestAnimationFrame(takeSnapShot);
+
     }, false);
   };
+
+  timeline.addEventListener('click', function(event) {
+    if(event.target.src) {
+      window.open(event.target.src);
+    }
+  });
 
 })();

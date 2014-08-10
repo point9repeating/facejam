@@ -7,8 +7,8 @@ body {
     height:100%;
     margin:0;
     padding:0;
-    background-color:#000;
-    color:#fff;
+    background-color:#fff;
+    color:#000;
 }
 
 video {
@@ -33,4 +33,19 @@ form {
     position:fixed;
     bottom:0;
     left:0;
+    z-index:999;
+}
+
+#timeline {
+    position:fixed;
+    bottom:0;
+    min-width: 100%;
+    overflow-x:scroll;
+    height: 100px;
+    opacity:0.5;
+}
+
+#timeline img {
+    height:100px;
+    float:left;
 }
